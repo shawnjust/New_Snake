@@ -4,7 +4,6 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.controls.AnalogOnScreenControl;
 import org.andengine.engine.camera.hud.controls.AnalogOnScreenControl.IAnalogOnScreenControlListener;
 import org.andengine.engine.camera.hud.controls.BaseOnScreenControl;
-import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -27,7 +26,7 @@ import android.opengl.GLES20;
 
 public class MainActivity extends SimpleBaseGameActivity {
 
-	private static int snakeSpeed = 100;
+	private static int snakeSpeed = 200;
 
 	private static final int CAMERA_WIDTH = 800;
 	private static final int CAMERA_HEIGHT = 480;
@@ -100,7 +99,7 @@ public class MainActivity extends SimpleBaseGameActivity {
 				.getHeight()) / 2;
 		final Sprite face = new Sprite(centerX, centerY,
 				this.mPlayerTextureRegion, this.getVertexBufferObjectManager());
-		final PhysicsHandler physicsHandler = new PhysicsHandler(face);
+		final MyPhysicsHandler physicsHandler = new MyPhysicsHandler(face);
 		face.registerUpdateHandler(physicsHandler);
 
 		scene.attachChild(face);
@@ -121,8 +120,12 @@ public class MainActivity extends SimpleBaseGameActivity {
 							final BaseOnScreenControl pBaseOnScreenControl,
 							final float pValueX, final float pValueY) {
 
-						physicsHandler.setAcceleration((float) 5);
-						physicsHandler.setAngularVelocity(10);
+						if (pValueX == 0 && pValueY == 0) {
+							physicsHandler.setRadius(0);
+						} else {
+							physicsHandler.setSpeed(150);
+							physicsHandler.setRadius(60);
+						}
 
 						// final MyRotation myRotation = new MyRotation();
 						//
@@ -141,7 +144,7 @@ public class MainActivity extends SimpleBaseGameActivity {
 						// }
 						// myRotation.setX0(x0);
 						// myRotation.setY0(y0);
-						// myRotation.setRotation((float) 0.1);
+						// myRotation.setRotation((float) 0.5);
 						//
 						// physicsHandler.setVelocity(myRotation.getX1(),
 						// myRotation.getY1());
