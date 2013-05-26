@@ -107,9 +107,9 @@ public class MainActivity extends SimpleBaseGameActivity {
 		final AnalogOnScreenControl analogOnScreenControl = new AnalogOnScreenControl(
 				CAMERA_WIDTH
 						- this.mOnScreenControlBaseTextureRegion.getWidth()
-						- 50, CAMERA_HEIGHT
+						- 70, CAMERA_HEIGHT
 						- this.mOnScreenControlBaseTextureRegion.getHeight()
-						- 20, this.camera,
+						- 40, this.camera,
 				this.mOnScreenControlBaseTextureRegion,
 				this.mOnScreenControlKnobTextureRegion, 0.1f, 200,
 				this.getVertexBufferObjectManager(),
@@ -119,7 +119,7 @@ public class MainActivity extends SimpleBaseGameActivity {
 					public void onControlChange(
 							final BaseOnScreenControl pBaseOnScreenControl,
 							final float pValueX, final float pValueY) {
-
+						physicsHandler.setRotation(pValueX, pValueY);
 						if (pValueX == 0 && pValueY == 0) {
 							physicsHandler.setRadius(0);
 						} else {
