@@ -121,14 +121,40 @@ public class MainActivity extends SimpleBaseGameActivity {
 				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
 		final Sprite body2 = new Sprite(bodyCenterX, bodyCenterY,
 				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body3 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body4 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body5 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body6 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body7 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
 		scene.attachChild(body1);
 		scene.attachChild(body2);
+		scene.attachChild(body3);
+		scene.attachChild(body4);
+		scene.attachChild(body5);
+		scene.attachChild(body6);
+		scene.attachChild(body7);
+		
 		
 		body1.setZIndex(9999);
 		body2.setZIndex(9998);
+		body3.setZIndex(9997);
+		body4.setZIndex(9996);
+		body4.setZIndex(9995);
+		body4.setZIndex(9994);
+		body4.setZIndex(9993);
 
 		physicsHandler.addBody(body1);
 		physicsHandler.addBody(body2);
+		physicsHandler.addBody(body3);
+		physicsHandler.addBody(body4);
+		physicsHandler.addBody(body5);
+		physicsHandler.addBody(body6);
+		physicsHandler.addBody(body7);
 
 		scene.sortChildren();
 

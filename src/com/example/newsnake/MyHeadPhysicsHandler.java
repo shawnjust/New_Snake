@@ -14,7 +14,7 @@ import com.example.newsnake.snakeinfo.PositionInformation;
 
 public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 
-	protected final float SPACE_TIME = 0.2f;
+	protected final float SPACE_TIME = 0.15f;
 	protected final float HEAD_SPACE_TIME = 0.05f;
 
 	protected float mSpeed;
@@ -115,32 +115,59 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 		while (itBody.hasNext()) {
 			Sprite body = itBody.next();
 			++count;
+//			previouspos = currentpos;
+//			while (itPos.hasNext()) {
+//				currentpos = itPos.next();
+//				if (contentTime - currentpos.getTime() > SPACE_TIME * count + HEAD_SPACE_TIME) {
+//					float abs1, abs2;
+//					abs1 = Math.abs(contentTime - currentpos.getTime()
+//							- SPACE_TIME * count+ HEAD_SPACE_TIME);
+//					abs2 = Math.abs(contentTime - previouspos.getTime()
+//							- SPACE_TIME * count+ HEAD_SPACE_TIME);
+//
+//					workpos = new PositionInformation();
+//					workpos.setPositionX((currentpos.getPositionX() * abs2 + previouspos
+//							.getPositionX() * abs1)
+//							/ (abs1 + abs2));
+//					workpos.setPositionY((currentpos.getPositionY() * abs2 + previouspos
+//							.getPositionY() * abs1)
+//							/ (abs1 + abs2));
+//					workpos.setRotation(currentpos.getRotation());
+//					break;
+//				}
+//				previouspos = currentpos;
+//				workpos = currentpos;
+//			}
+//			body.setPosition(workpos.getPositionX() - body.getWidth() / 2,
+//					workpos.getPositionY() - body.getHeight() / 2);
+//			body.setRotation(workpos.getRotation());
+			
 			previouspos = currentpos;
 			while (itPos.hasNext()) {
-				currentpos = itPos.next();
-				if (contentTime - currentpos.getTime() > SPACE_TIME * count + HEAD_SPACE_TIME) {
-					float abs1, abs2;
-					abs1 = Math.abs(contentTime - currentpos.getTime()
-							- SPACE_TIME * count+ HEAD_SPACE_TIME);
-					abs2 = Math.abs(contentTime - previouspos.getTime()
-							- SPACE_TIME * count+ HEAD_SPACE_TIME);
-
-					workpos = new PositionInformation();
-					workpos.setPositionX((currentpos.getPositionX() * abs2 + previouspos
-							.getPositionX() * abs1)
-							/ (abs1 + abs2));
-					workpos.setPositionY((currentpos.getPositionY() * abs2 + previouspos
-							.getPositionY() * abs1)
-							/ (abs1 + abs2));
-					workpos.setRotation(currentpos.getRotation());
-					break;
+				workpos = itPos.next();
+				currentpos = workpos;
+				if (contentTime - workpos.getTime() > SPACE_TIME * count + HEAD_SPACE_TIME) {
+					if (Math.abs(contentTime - previouspos.getTime() - (SPACE_TIME * count + HEAD_SPACE_TIME)) < Math.abs(contentTime - currentpos.getTime() - (SPACE_TIME * count + HEAD_SPACE_TIME))){
+						workpos = previouspos;
+						break;
+					}
 				}
 				previouspos = currentpos;
-				workpos = currentpos;
 			}
+			
+			theta0 = (float) (body.getRotation() * Math.PI / 180);
+			
+			Vx = (float) (this.mSpeed * Math.sin(theta0));
+			Vy = (float) (this.mSpeed * Math.cos(theta0));
+			positionX = body.getX() - Vx * pSecondsElapsed;
+			positionY = body.getY() + Vy * pSecondsElapsed;
+			
+			positionX = (positionX * 3 / 4 + (workpos.getPositionX() - body.getWidth() / 2) * 1 / 4) ;
+			positionY = (positionY * 3 / 4 + (workpos.getPositionY() - body.getHeight() / 2) * 1 / 4);
+			body.setPosition(positionX, positionY);
 
-			body.setPosition(workpos.getPositionX() - body.getWidth() / 2,
-					workpos.getPositionY() - body.getHeight() / 2);
+//			body.setPosition(workpos.getPositionX() - body.getWidth() / 2,
+//					workpos.getPositionY() - body.getHeight() / 2);
 			body.setRotation(workpos.getRotation());
 		}
 
