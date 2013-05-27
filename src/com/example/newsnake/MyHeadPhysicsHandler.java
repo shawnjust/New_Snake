@@ -14,7 +14,7 @@ import com.example.newsnake.snakeinfo.PositionInformation;
 
 public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 
-	protected final float SPACE_TIME = 0.12f;
+	protected final float SPACE_TIME = 0.2f;
 
 	protected float mSpeed;
 	protected float mRadius;
@@ -110,18 +110,41 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 		Iterator<Sprite> itBody = bodyList.iterator();
 		int count = 0;
 
+		PositionInformation currentpos = pos, previouspos = pos, workpos = pos;
 		while (itBody.hasNext()) {
 			Sprite body = itBody.next();
 			++count;
 			while (itPos.hasNext()) {
-				pos = itPos.next();
-				if (contentTime - pos.getTime() > SPACE_TIME * count)
+				currentpos = itPos.next();
+				if (contentTime - currentpos.getTime() > SPACE_TIME * count) {
+					float abs1, abs2;
+					abs1 = Math.abs(contentTime - currentpos.getTime()
+							- SPACE_TIME * count);
+					abs2 = Math.abs(contentTime - previouspos.getTime()
+							- SPACE_TIME * count);
+
+					workpos = new PositionInformation();
+					workpos.setPositionX((currentpos.getPositionX() * abs2 + previouspos
+							.getPositionX() * abs1)
+							/ (abs1 + abs2));
+					workpos.setPositionY((currentpos.getPositionY() * abs2 + previouspos
+							.getPositionY() * abs1)
+							/ (abs1 + abs2));
+					workpos.setRotation(currentpos.getRotation());
 					break;
+				}
+				previouspos = currentpos;
+				workpos = currentpos;
 			}
 
-			body.setPosition(pos.getPositionX() - body.getWidth() / 2,
-					pos.getPositionY() - body.getHeight() / 2);
-			body.setRotation(pos.getRotation());
+			body.setPosition(workpos.getPositionX() - body.getWidth() / 2,
+					workpos.getPositionY() - body.getHeight() / 2);
+			body.setRotation(workpos.getRotation());
+		}
+
+		while (itPos.hasNext()) {
+			itPos.next();
+			itPos.remove();
 		}
 	}
 
