@@ -26,15 +26,16 @@ import android.opengl.GLES20;
 
 public class MainActivity extends SimpleBaseGameActivity {
 
-	private static int snakeSpeed = 200;
-
-	private static final int CAMERA_WIDTH = 800;
-	private static final int CAMERA_HEIGHT = 480;
+	public static final int CAMERA_WIDTH = 800;
+	public static final int CAMERA_HEIGHT = 480;
 
 	private Camera camera;
 
-	private BitmapTextureAtlas mBitmapTextureAtlas;
-	private TiledTextureRegion mPlayerTextureRegion;
+	private BitmapTextureAtlas mHeadBitmapTextureAtlas;
+	private TiledTextureRegion mHeadTextureRegion;
+
+	private BitmapTextureAtlas mBodyBitmapTextureAtlas;
+	private TiledTextureRegion mBodyTextureRegion;
 
 	private BitmapTextureAtlas mAutoParallaxBackgroundTexture;
 	private TextureRegion mGrassBackground;
@@ -56,12 +57,19 @@ public class MainActivity extends SimpleBaseGameActivity {
 	public void onCreateResources() {
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("image/");
 
-		this.mBitmapTextureAtlas = new BitmapTextureAtlas(
+		this.mHeadBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 128, 128, TextureOptions.BILINEAR);
-		this.mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createTiledFromAsset(this.mBitmapTextureAtlas, this,
+		this.mHeadTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.mHeadBitmapTextureAtlas, this,
 						"head_new.png", 0, 0, 1, 1);
-		this.mBitmapTextureAtlas.load();
+		this.mHeadBitmapTextureAtlas.load();
+
+		this.mBodyBitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 128, 128, TextureOptions.BILINEAR);
+		this.mBodyTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.mBodyBitmapTextureAtlas, this,
+						"body_new.png", 0, 0, 1, 1);
+		this.mBodyBitmapTextureAtlas.load();
 
 		this.mAutoParallaxBackgroundTexture = new BitmapTextureAtlas(
 				this.getTextureManager(), 1024, 1024);
@@ -93,16 +101,46 @@ public class MainActivity extends SimpleBaseGameActivity {
 						.getVertexBufferObjectManager())));
 		scene.setBackground(autoParallaxBackground);
 
-		final float centerX = (CAMERA_WIDTH - this.mPlayerTextureRegion
+		final float headCenterX = (CAMERA_WIDTH - this.mHeadTextureRegion
 				.getWidth()) / 2;
-		final float centerY = (CAMERA_HEIGHT - this.mPlayerTextureRegion
+		final float headCenterY = (CAMERA_HEIGHT - this.mHeadTextureRegion
 				.getHeight()) / 2;
-		final Sprite face = new Sprite(centerX, centerY,
-				this.mPlayerTextureRegion, this.getVertexBufferObjectManager());
-		final MyPhysicsHandler physicsHandler = new MyPhysicsHandler(face);
-		face.registerUpdateHandler(physicsHandler);
+		final Sprite head = new Sprite(headCenterX, headCenterY,
+				this.mHeadTextureRegion, this.getVertexBufferObjectManager());
+		final MyHeadPhysicsHandler physicsHandler = new MyHeadPhysicsHandler(
+				head);
+		head.registerUpdateHandler(physicsHandler);
+		scene.attachChild(head);
+		head.setZIndex(10000);
 
-		scene.attachChild(face);
+		final float bodyCenterX = (CAMERA_WIDTH - this.mBodyTextureRegion
+				.getWidth()) / 2;
+		final float bodyCenterY = (CAMERA_HEIGHT - this.mBodyTextureRegion
+				.getHeight()) / 2;
+		final Sprite body1 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body2 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body3 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite body4 = new Sprite(bodyCenterX, bodyCenterY,
+				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
+		scene.attachChild(body1);
+		scene.attachChild(body2);
+		scene.attachChild(body3);
+		scene.attachChild(body4);
+		
+		body1.setZIndex(9999);
+		body2.setZIndex(9998);
+		body3.setZIndex(9997);
+		body4.setZIndex(9996);
+
+		physicsHandler.addBody(body1);
+		physicsHandler.addBody(body2);
+		physicsHandler.addBody(body3);
+		physicsHandler.addBody(body4);
+
+		scene.sortChildren();
 
 		final AnalogOnScreenControl analogOnScreenControl = new AnalogOnScreenControl(
 				CAMERA_WIDTH
@@ -126,39 +164,12 @@ public class MainActivity extends SimpleBaseGameActivity {
 							physicsHandler.setSpeed(150);
 							physicsHandler.setRadius(60);
 						}
-
-						// final MyRotation myRotation = new MyRotation();
-						//
-						// float base = (float) Math.sqrt(pValueX * pValueX
-						// + pValueY * pValueY);
-						// if (base == 0.0) {
-						// physicsHandler.setAngularVelocity(0);
-						// return;
-						// }
-						//
-						// float x0 = physicsHandler.getVelocityX();
-						// float y0 = physicsHandler.getVelocityY();
-						// if (x0 == 0 && y0 == 0) {
-						// x0 = snakeSpeed;
-						// y0 = 0;
-						// }
-						// myRotation.setX0(x0);
-						// myRotation.setY0(y0);
-						// myRotation.setRotation((float) 0.5);
-						//
-						// physicsHandler.setVelocity(myRotation.getX1(),
-						// myRotation.getY1());
-						//
-						// physicsHandler.setAngularVelocity(100);
-						// face.setRotation(MathUtils.radToDeg((float)
-						// Math.atan2(
-						// -myRotation.getX1(), myRotation.getY1())));
 					}
 
 					@Override
 					public void onControlClick(
 							final AnalogOnScreenControl pAnalogOnScreenControl) {
-						face.registerEntityModifier(new SequenceEntityModifier(
+						head.registerEntityModifier(new SequenceEntityModifier(
 								new ScaleModifier(0.25f, 1, 1.5f),
 								new ScaleModifier(0.25f, 1.5f, 1)));
 					}
@@ -173,43 +184,5 @@ public class MainActivity extends SimpleBaseGameActivity {
 
 		scene.setChildScene(analogOnScreenControl);
 		return scene;
-	}
-
-	class MyRotation {
-		protected float x0 = 0, y0 = 0;
-		protected float rotation = 0;
-
-		public float getRotation() {
-			return rotation;
-		}
-
-		public void setRotation(float rotation) {
-			this.rotation = rotation;
-		}
-
-		public float getX0() {
-			return x0;
-		}
-
-		public void setX0(float x0) {
-			this.x0 = x0;
-		}
-
-		public float getY0() {
-			return y0;
-		}
-
-		public void setY0(float y0) {
-			this.y0 = y0;
-		}
-
-		public float getX1() {
-			return (float) (x0 * Math.cos(rotation) - y0 * Math.sin(rotation));
-		}
-
-		public float getY1() {
-			return (float) (x0 * Math.sin(rotation) + y0 * Math.cos(rotation));
-		}
-
 	}
 }
