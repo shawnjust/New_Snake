@@ -15,6 +15,7 @@ import com.example.newsnake.snakeinfo.PositionInformation;
 public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 
 	protected final float SPACE_TIME = 0.2f;
+	protected final float HEAD_SPACE_TIME = 0.05f;
 
 	protected float mSpeed;
 	protected float mRadius;
@@ -90,7 +91,7 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 			theta -= Math.PI * 2;
 		while (theta < 0)
 			theta += Math.PI * 2;
-		Log.v("atan2", "" + theta);
+		Log.v("atan2", "" + pSecondsElapsed);
 		pEntity.setRotation((float) (theta * 180 / Math.PI));
 		float Vx = (float) (this.mSpeed * Math.sin(theta0));
 		float Vy = (float) (this.mSpeed * Math.cos(theta0));
@@ -114,14 +115,15 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 		while (itBody.hasNext()) {
 			Sprite body = itBody.next();
 			++count;
+			previouspos = currentpos;
 			while (itPos.hasNext()) {
 				currentpos = itPos.next();
-				if (contentTime - currentpos.getTime() > SPACE_TIME * count) {
+				if (contentTime - currentpos.getTime() > SPACE_TIME * count + HEAD_SPACE_TIME) {
 					float abs1, abs2;
 					abs1 = Math.abs(contentTime - currentpos.getTime()
-							- SPACE_TIME * count);
+							- SPACE_TIME * count+ HEAD_SPACE_TIME);
 					abs2 = Math.abs(contentTime - previouspos.getTime()
-							- SPACE_TIME * count);
+							- SPACE_TIME * count+ HEAD_SPACE_TIME);
 
 					workpos = new PositionInformation();
 					workpos.setPositionX((currentpos.getPositionX() * abs2 + previouspos

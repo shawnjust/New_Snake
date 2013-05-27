@@ -121,24 +121,14 @@ public class MainActivity extends SimpleBaseGameActivity {
 				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
 		final Sprite body2 = new Sprite(bodyCenterX, bodyCenterY,
 				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body3 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body4 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
 		scene.attachChild(body1);
 		scene.attachChild(body2);
-		scene.attachChild(body3);
-		scene.attachChild(body4);
 		
 		body1.setZIndex(9999);
 		body2.setZIndex(9998);
-		body3.setZIndex(9997);
-		body4.setZIndex(9996);
 
 		physicsHandler.addBody(body1);
 		physicsHandler.addBody(body2);
-		physicsHandler.addBody(body3);
-		physicsHandler.addBody(body4);
 
 		scene.sortChildren();
 
