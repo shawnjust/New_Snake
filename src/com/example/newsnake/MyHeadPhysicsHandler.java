@@ -162,8 +162,8 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 			positionX = body.getX() - Vx * pSecondsElapsed;
 			positionY = body.getY() + Vy * pSecondsElapsed;
 			
-			positionX = (positionX * 3 / 4 + (workpos.getPositionX() - body.getWidth() / 2) * 1 / 4) ;
-			positionY = (positionY * 3 / 4 + (workpos.getPositionY() - body.getHeight() / 2) * 1 / 4);
+			positionX = (positionX * 9 / 10 + (workpos.getPositionX() - body.getWidth() / 2) * 1 / 10) ;
+			positionY = (positionY * 9 / 10 + (workpos.getPositionY() - body.getHeight() / 2) * 1 / 10);
 			body.setPosition(positionX, positionY);
 
 //			body.setPosition(workpos.getPositionX() - body.getWidth() / 2,
