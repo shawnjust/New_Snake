@@ -10,6 +10,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
+import org.andengine.entity.scene.CameraScene;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.AutoParallaxBackground;
 import org.andengine.entity.scene.background.ParallaxBackground.ParallaxEntity;
@@ -45,8 +46,13 @@ public class MainActivity extends SimpleBaseGameActivity {
 	private ITextureRegion mOnScreenControlBaseTextureRegion;
 	private ITextureRegion mOnScreenControlKnobTextureRegion;
 
-	private BitmapTextureAtlas mFoodBitmapTextureAtlas;
-	private TiledTextureRegion mFoodTextureRegion;
+	private BitmapTextureAtlas mFood1BitmapTextureAtlas;
+	private TiledTextureRegion mFood1TextureRegion;
+
+	private BitmapTextureAtlas mFood2BitmapTextureAtlas;
+	private TiledTextureRegion mFood2TextureRegion;
+
+	private CameraScene mPauseScene;
 
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -92,17 +98,28 @@ public class MainActivity extends SimpleBaseGameActivity {
 						"onscreen_control_knob_new.png", 128, 0);
 		this.mOnScreenControlTexture.load();
 
-		this.mFoodBitmapTextureAtlas = new BitmapTextureAtlas(
-				this.getTextureManager(), 128, 128);
-		this.mFoodTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createTiledFromAsset(this.mFoodBitmapTextureAtlas, this,
+		this.mFood1BitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 128, 128, TextureOptions.BILINEAR);
+		this.mFood1TextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.mFood1BitmapTextureAtlas, this,
 						"food1_new.png", 0, 0, 1, 1);
-		this.mFoodBitmapTextureAtlas.load();
+		this.mFood1BitmapTextureAtlas.load();
+
+		this.mFood2BitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 128, 128, TextureOptions.BILINEAR);
+		this.mFood2TextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.mFood2BitmapTextureAtlas, this,
+						"food2_new.png", 0, 0, 1, 1);
+		this.mFood2BitmapTextureAtlas.load();
 	}
 
 	@Override
 	protected Scene onCreateScene() {
+
 		this.mEngine.registerUpdateHandler(new FPSLogger());
+
+		this.mPauseScene = new CameraScene(camera);
+		this.mPauseScene.setBackgroundEnabled(false);
 
 		final Scene scene = new Scene();
 		final AutoParallaxBackground autoParallaxBackground = new AutoParallaxBackground(
@@ -124,13 +141,17 @@ public class MainActivity extends SimpleBaseGameActivity {
 		scene.attachChild(head);
 		head.setZIndex(10000);
 
-		float foodCenterX = (float) (Math.random() * CAMERA_WIDTH - this.mFoodTextureRegion
+		float foodCenterX = (float) (Math.random() * (CAMERA_WIDTH - 80) + 40 - this.mFood1TextureRegion
 				.getWidth() / 2);
-		float foodCenterY = (float) (Math.random() * CAMERA_HEIGHT - this.mFoodTextureRegion
+		float foodCenterY = (float) (Math.random() * (CAMERA_HEIGHT - 80) + 40 - this.mFood1TextureRegion
 				.getHeight() / 2);
-		final Sprite food = new Sprite(foodCenterX, foodCenterY,
-				mFoodTextureRegion, this.getVertexBufferObjectManager());
-		scene.attachChild(food);
+		final Sprite food1 = new Sprite(foodCenterX, foodCenterY,
+				mFood1TextureRegion, this.getVertexBufferObjectManager());
+		final Sprite food2 = new Sprite(CAMERA_WIDTH + 100,
+				CAMERA_HEIGHT + 100, mFood2TextureRegion,
+				this.getVertexBufferObjectManager());
+		scene.attachChild(food1);
+		scene.attachChild(food2);
 
 		final float bodyCenterX = (CAMERA_WIDTH / 4 - this.mBodyTextureRegion
 				.getWidth() / 2);
@@ -138,48 +159,18 @@ public class MainActivity extends SimpleBaseGameActivity {
 				.getHeight() / 2);
 		final Sprite body1 = new Sprite(bodyCenterX, bodyCenterY,
 				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body2 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body3 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body4 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body5 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body6 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
-		final Sprite body7 = new Sprite(bodyCenterX, bodyCenterY,
-				this.mBodyTextureRegion, this.getVertexBufferObjectManager());
 		scene.attachChild(body1);
-		scene.attachChild(body2);
-		scene.attachChild(body3);
-		scene.attachChild(body4);
-		scene.attachChild(body5);
-		scene.attachChild(body6);
-		scene.attachChild(body7);
 
 		body1.setZIndex(9999);
-		body2.setZIndex(9998);
-		body3.setZIndex(9997);
-		body4.setZIndex(9996);
-		body4.setZIndex(9995);
-		body4.setZIndex(9994);
-		body4.setZIndex(9993);
 
 		physicsHandler.addBody(body1);
-		physicsHandler.addBody(body2);
-		physicsHandler.addBody(body3);
-		physicsHandler.addBody(body4);
-		physicsHandler.addBody(body5);
-		physicsHandler.addBody(body6);
-		physicsHandler.addBody(body7);
 
 		scene.registerUpdateHandler(new IUpdateHandler() {
 
+			Sprite food = food1;
+
 			@Override
 			public void reset() {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
@@ -189,20 +180,36 @@ public class MainActivity extends SimpleBaseGameActivity {
 				float headPosX = head.getX() + head.getWidth() / 2;
 				float headPosY = head.getY() + head.getHeight() / 2;
 				if ((foodPosX - headPosX) * (foodPosX - headPosX)
-						+ (foodPosY - headPosY) * (foodPosY - headPosY) < 20 * 20) {
+						+ (foodPosY - headPosY) * (foodPosY - headPosY) < 40 * 40) {
 					Sprite body = new Sprite(bodyCenterX, bodyCenterY,
 							MainActivity.this.mBodyTextureRegion,
 							MainActivity.this.getVertexBufferObjectManager());
 					scene.attachChild(body);
 					body.setZIndex(9999);
 					physicsHandler.addBody(body);
-					float foodCenterX = (float) (Math.random() * CAMERA_WIDTH - MainActivity.this.mFoodTextureRegion
+					food.setPosition(CAMERA_WIDTH + 100, CAMERA_HEIGHT + 100);
+
+					if (Math.random() > 0.5) {
+						food = food1;
+					} else {
+						food = food2;
+					}
+
+					float foodCenterX = (float) (Math.random()
+							* (CAMERA_WIDTH - 80) + 40 - MainActivity.this.mFood1TextureRegion
 							.getWidth() / 2);
-					float foodCenterY = (float) (Math.random() * CAMERA_HEIGHT - MainActivity.this.mFoodTextureRegion
+					float foodCenterY = (float) (Math.random()
+							* (CAMERA_HEIGHT - 80) + 40 - MainActivity.this.mFood1TextureRegion
 							.getHeight() / 2);
 					food.setPosition(foodCenterX, foodCenterY);
 				}
-
+				if ((headPosX < 0) || (headPosY < 0)
+						|| (headPosX > CAMERA_WIDTH)
+						|| (headPosY > CAMERA_HEIGHT)) {
+					MainActivity.this.mEngine.stop();
+					scene.setChildScene(mPauseScene);
+					// MainActivity.this.mEngine.setScene(MainActivity.this.onCreateScene());
+				}
 			}
 		});
 
@@ -223,12 +230,13 @@ public class MainActivity extends SimpleBaseGameActivity {
 					public void onControlChange(
 							final BaseOnScreenControl pBaseOnScreenControl,
 							final float pValueX, final float pValueY) {
-						physicsHandler.setRotation(pValueX, pValueY);
+
 						if (pValueX == 0 && pValueY == 0) {
-							physicsHandler.setRadius(0);
+							// physicsHandler.setRadius(0);
 						} else {
-							physicsHandler.setSpeed(150);
+							physicsHandler.setSpeed(200);
 							physicsHandler.setRadius(60);
+							physicsHandler.setRotation(pValueX, pValueY);
 						}
 					}
 
@@ -249,6 +257,7 @@ public class MainActivity extends SimpleBaseGameActivity {
 		analogOnScreenControl.refreshControlKnobPosition();
 
 		scene.setChildScene(analogOnScreenControl);
+
 		return scene;
 	}
 }

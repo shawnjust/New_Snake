@@ -8,8 +8,6 @@ import org.andengine.engine.handler.BaseEntityUpdateHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.sprite.Sprite;
 
-import android.util.Log;
-
 import com.example.newsnake.snakeinfo.PositionInformation;
 
 public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
@@ -91,7 +89,7 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 			theta -= Math.PI * 2;
 		while (theta < 0)
 			theta += Math.PI * 2;
-		Log.v("atan2", "" + pSecondsElapsed);
+		// Log.v("atan2", "" + pSecondsElapsed);
 		pEntity.setRotation((float) (theta * 180 / Math.PI));
 		float Vx = (float) (this.mSpeed * Math.sin(theta0));
 		float Vy = (float) (this.mSpeed * Math.cos(theta0));
