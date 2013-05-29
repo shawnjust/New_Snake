@@ -21,11 +21,49 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 
 	protected float contentTime;
 
+	protected boolean able;
+
 	protected List<PositionInformation> bodyPositionList;
 	protected List<Sprite> bodyList;
 
+	public Iterator<Sprite> getBodyListIterator() {
+		if (bodyList != null) 
+			return bodyList.iterator();
+		 else
+			return null;
+	}
+
+	public void enable() {
+		able = true;
+	}
+
+	public void disable() {
+		able = false;
+	}
+
 	public void addBody(Sprite pBody) {
 		bodyList.add(pBody);
+		Iterator<PositionInformation> itPos = bodyPositionList.iterator();
+		PositionInformation workpos = null;
+		while (itPos.hasNext()) {
+			workpos = itPos.next();
+			if (contentTime - workpos.getTime() > SPACE_TIME * bodyList.size()
+					+ HEAD_SPACE_TIME) {
+
+				break;
+			}
+		}
+		if (workpos == null) {
+			Sprite head = (Sprite) this.getEntity();
+			pBody.setRotation(head.getRotation());
+			pBody.setPosition(
+					head.getX() + head.getWidth() / 2 - pBody.getWidth() / 2,
+					head.getY() + head.getHeight() / 2 - pBody.getHeight() / 2);
+		} else {
+			pBody.setRotation(workpos.getRotation());
+			pBody.setPosition(workpos.getPositionX() - pBody.getWidth() / 2,
+					workpos.getPositionY() - pBody.getHeight() / 2);
+		}
 	}
 
 	public void setRotation(float px, float py) {
@@ -68,6 +106,10 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 
 	@Override
 	protected void onUpdate(final float pSecondsElapsed, final IEntity pEntity) {
+
+		if (!able) {
+			return;
+		}
 
 		contentTime += pSecondsElapsed;
 
@@ -191,6 +233,7 @@ public class MyHeadPhysicsHandler extends BaseEntityUpdateHandler {
 
 	@Override
 	public void reset() {
+		able = true;
 		mSpeed = 0.0f;
 		mRadius = 0.0f;
 		mRotation = 0.0f;
